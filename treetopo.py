@@ -164,3 +164,58 @@ def run_tree():
 
 if __name__ == '__main__':
     run_tree()
+
+or run this one:
+
+from mininet.net import Mininet
+from mininet.node import OVSSwitch, Controller
+from mininet.log import setLogLevel
+from mininet.cli import CLI
+
+def run_tree():
+    setLogLevel('info')
+
+    # Basic Mininet (no TCLink to avoid HTB warnings)
+    net = Mininet(controller=Controller, switch=OVSSwitch)
+
+    # Controller
+    net.addController('c0')
+
+    # Switches
+    s1 = net.addSwitch('s1')
+    s2 = net.addSwitch('s2')
+    s3 = net.addSwitch('s3')
+
+    # Hosts
+    h1 = net.addHost('h1')
+    h2 = net.addHost('h2')
+    h3 = net.addHost('h3')
+    h4 = net.addHost('h4')
+
+    # Tree links
+    net.addLink(s1, s2)
+    net.addLink(s1, s3)
+    net.addLink(s2, h1)
+    net.addLink(s2, h2)
+    net.addLink(s3, h3)
+    net.addLink(s3, h4)
+
+    # Start network
+    net.start()
+
+    # Assign IPs manually (inside code)
+    h1.setIP('10.0.0.1/24')
+    h2.setIP('10.0.0.2/24')
+    h3.setIP('10.0.0.3/24')
+    h4.setIP('10.0.0.4/24')
+
+    # Open CLI for manual commands
+    CLI(net)
+
+    # Stop network
+    net.stop()
+
+
+if __name__ == '__main__':
+    run_tree()
+  
