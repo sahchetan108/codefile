@@ -47,3 +47,37 @@ h1 arp -n
 h3 arp -n
 h4 iperf -s -u -p 5001 &
 h1 iperf -c 10.0.0.4 -u -b 10M -t 10 -p 5001
+
+
+# Print host MACs
+mininet> py for h in net.hosts: print(h.name, h.MAC())
+
+# Show host interfaces & MAC (ifconfig -a)
+mininet> h1 ifconfig -a
+mininet> s1 ifconfig -a
+
+# Assign IPs
+mininet> h1 ifconfig h1-eth0 10.0.0.1/24
+mininet> h2 ifconfig h2-eth0 10.0.0.2/24
+mininet> h3 ifconfig h3-eth0 10.0.0.3/24
+mininet> h4 ifconfig h4-eth0 10.0.0.4/24
+
+# Verify IPs
+mininet> h1 ip addr show
+mininet> h2 ip addr show
+mininet> h3 ip addr show
+mininet> h4 ip addr show
+
+# Ping tests
+mininet> h3 ping -c 5 10.0.0.1
+mininet> h2 ping -c 5 10.0.0.4
+
+# ARP tables
+mininet> h1 arp -n
+mininet> h3 arp -n
+
+# UDP iperf
+mininet> h4 iperf -s -u &      # server
+mininet> h1 iperf -c 10.0.0.4 -u -b 10M -t 10
+
+
