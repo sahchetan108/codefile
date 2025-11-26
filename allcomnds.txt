@@ -1,0 +1,49 @@
+ip netns add one
+ip netns add two
+ip netns add three
+
+
+ip link add veth-one0 type veth peer name veth-two0
+ip link add veth-two1 type veth peer name veth-three0
+
+
+ip link set veth-one0 netns one
+ip link set veth-two0 netns two
+
+ip link set veth-two1 netns two
+ip link set veth-three0 netns three
+
+
+ip netns exec one ip link set lo up
+ip netns exec two ip link set lo up
+ip netns exec three ip link set lo up
+
+ip netns exec one ip link set veth-one0 up
+ip netns exec two ip link set veth-two0 up
+ip netns exec two ip link set veth-two1 up
+ip netns exec three ip link set veth-three0 up
+
+ip netns exec one ip addr add 10.0.0.1/24 dev veth-one0
+ip netns exec two ip addr add 10.0.0.2/24 dev veth-two0
+
+ip netns exec two   ip addr add 20.0.0.1/24 dev veth-two1
+ip netns exec three ip addr add 20.0.0.2/24 dev veth-three0
+
+ip netns exec one ip route add default via 10.0.0.2 dev veth-one0
+ip netns exec two ip route add default via 10.0.0.1 dev veth-two0
+ip netns exec three ip route add default via 20.0.0.1 dev veth-three0
+
+ip netns exec one ping -c 3 10.0.0.2
+ip netns exec two ping -c 3 10.0.0.1
+
+ip netns exec two ping -c 3 20.0.0.2
+ip netns exec three ping -c 3 20.0.0.1
+
+h1 ifconfig -a
+s1 ifconfig -a
+h1 ip addr show
+h3 ping 10.0.0.1 -c 4
+h1 arp -n
+h3 arp -n
+h4 iperf -s -u -p 5001 &
+h1 iperf -c 10.0.0.4 -u -b 10M -t 10 -p 5001
